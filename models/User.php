@@ -2,15 +2,18 @@
 // Include the config file to access the database connection function
 require_once '../config/database.php';
 
-class User {
+class User
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = getDBConnection(); // Use the available DB connection
     }
 
     // Function to check if the user already exists
-    public function checkIfUserExists($username, $email) {
+    public function checkIfUserExists($username, $email)
+    {
         $sql = "SELECT * FROM users WHERE username = :username OR email = :email";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -22,7 +25,8 @@ class User {
     }
 
     // Function to create a new user
-    public function register($username, $email, $password) {
+    public function register($username, $email, $password)
+    {
         // Insert new user into the database
         $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
         $stmt = $this->db->prepare($sql);
@@ -34,7 +38,8 @@ class User {
     }
 
     // Function to check user credentials for login
-    public function checkLogin($username, $password) {
+    public function checkLogin($username, $password)
+    {
         $sql = "SELECT * FROM users WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -48,37 +53,37 @@ class User {
     }
 
     // Function to get all users
-    public function getAllUsers() {
-        $sql = "SELECT id, username, email FROM users"; // Fetching basic info only
+    public function getAllUsers()
+    {
+        $sql = "SELECT * FROM users"; // Fetching basic info only
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Return all users as an array
     }
 
-    // Function to add a new user
-    public function addUser($data) {
-        $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
+    public function getUserById($id)
+    {
+        $sql = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':username', $data['username']);
-        $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':password', password_hash($data['password'], PASSWORD_BCRYPT));
-
-        return $stmt->execute(); // Return true if user is added
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Function to update a user's details
-    public function updateUser($data) {
+    public function updateUser($data)
+    {
         $sql = "UPDATE users SET username = :username, email = :email WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':username', $data['username']);
-        $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':id', $data['id']);
-
-        return $stmt->execute(); // Return true if user is updated
+        $stmt->bindParam(':id', $data['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':username', $data['username'], PDO::PARAM_STR);
+        $stmt->bindParam(':email', $data['email'], PDO::PARAM_STR);
+        return $stmt->execute();
     }
 
     // Function to delete a user
-    public function deleteUser($id) {
+    public function deleteUser($id)
+    {
         $sql = "DELETE FROM users WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id);

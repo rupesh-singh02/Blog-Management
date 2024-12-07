@@ -222,8 +222,7 @@
                         <?php echo htmlspecialchars($successMessage); ?>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <a href="index.php?action=login" class="btn btn-primary">Login</a>
+                        <a href="index.php?action=login" class="btn btn-primary">Ok</a>
                     </div>
                 </div>
             </div>

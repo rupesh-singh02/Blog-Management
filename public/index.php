@@ -71,14 +71,21 @@ switch ($action) {
         $dashboardController->dashboard(); // Show dashboard
         break;
     case 'adminDashboard':
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: index.php?action=login');
+            exit;
+        }
         $section = $_GET['section'] ?? 'users';
         $adminController->adminDashboard($section);
         break;
 
     case 'adminAction':
-        $adminController->handleAction($_GET['action'], $_GET['type']);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: index.php?action=login');
+            exit;
+        }
+        $adminController->handleAction($_GET['task'], $_GET['type']);
         break;
-
 
     default:
         // Default action (show login page)
