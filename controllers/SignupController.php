@@ -7,11 +7,23 @@ require '../vendor/autoload.php';  // Composer autoload
 // Include the database connection and User model
 require_once '../config/database.php';
 require_once '../models/User.php';
+require_once '../models/EmailConfig.php';
+require_once '../models/EmailTemplate.php';
 
-class SignupController {
+class SignupController
+{
+    private $emailConfigModel;
+    private $emailTemplateModel;
+
+    public function __construct()
+    {
+        $this->emailConfigModel = new EmailConfig();
+        $this->emailTemplateModel = new EmailTemplate();
+    }
 
     // Handle signup form submission
-    public function signup() {
+    public function signup()
+    {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = $_POST['username'];
             $email = $_POST['email'];
@@ -33,39 +45,60 @@ class SignupController {
                 include '../views/login.php';  // Show the login form with success modal
             } else {
                 // Show error if registration failed (e.g., user already exists)
-                $error = "User already exists. Please choose a different username or email.";
+                $signupError = "User already exists. Please choose a different username or email.";
                 include '../views/login.php';  // Show signup form with error
             }
         }
     }
 
     // Function to send a success email with login credentials
-    private function sendSuccessEmail($email, $username, $password) {
+    public function sendSuccessEmail($email, $username, $password)
+    {
         $mail = new PHPMailer(true);
+
         try {
-            // Server settings
+            // Fetch SMTP configuration
+            $emailConfig = $this->emailConfigModel->getConfig();
+
+            // Fetch email template
+            $emailTemplate = $this->emailTemplateModel->getTemplate('welcome');
+
+            if (!$emailConfig || !$emailTemplate) {
+                throw new Exception("Email configuration or template not found in database.");
+            }
+
+            // Replace placeholders in the template
+            $emailBody = str_replace(
+                ['{username}', '{password}'],
+                [$username, $password],
+                $emailTemplate['body']
+            );
+
+            // Configure PHPMailer
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';  // Set the SMTP server (use your SMTP provider)
+            $mail->Host = $emailConfig['smtp_host'];
             $mail->SMTPAuth = true;
-            $mail->Username = 'your_email@gmail.com';  // SMTP username
-            $mail->Password = 'your_email_password';  // SMTP password
+            $mail->Username = $emailConfig['smtp_username'];
+            $mail->Password = $emailConfig['smtp_password'];
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->Port = $emailConfig['smtp_port'];
 
-            // Recipients
-            $mail->setFrom('your_email@gmail.com', 'Your Name');
-            $mail->addAddress($email);  // Add the recipient's email
+            // Set email sender and recipient
+            $mail->setFrom($emailConfig['sender_email'], $emailConfig['sender_name']);
+            $mail->addAddress($email);
 
-            // Content
+            // Email content
             $mail->isHTML(true);
-            $mail->Subject = 'Your Signup Credentials';
-            $mail->Body    = "Hi $username,<br><br>You have successfully signed up.<br>Your login credentials are:<br>Username: $username<br>Password: $password<br><br>Thanks for joining us!";
+            $mail->Subject = $emailTemplate['subject'];
+            $mail->Body = $emailBody;
 
-            // Send the email
+            // Send email
             $mail->send();
+
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     }
+
 }
 ?>

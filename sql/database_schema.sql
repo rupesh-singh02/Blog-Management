@@ -43,3 +43,24 @@ CREATE TABLE comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE
 );
+
+-- Email Config table
+CREATE TABLE email_config (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    smtp_host VARCHAR(255) NOT NULL,
+    smtp_port INT NOT NULL,
+    smtp_username VARCHAR(255) NOT NULL,
+    smtp_password VARCHAR(255) NOT NULL,
+    sender_email VARCHAR(255) NOT NULL,
+    sender_name VARCHAR(255) NOT NULL
+);
+
+-- Email Templates table
+CREATE TABLE email_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    template_name VARCHAR(50) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    body BLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

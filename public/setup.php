@@ -1,6 +1,8 @@
 <?php
 // Include the config file that defines the database credentials
 require_once '../config/database.php';
+require_once '../email_templates/welcome.php';
+require_once '../email_templates/forgotpassword.php';
 
 // Step 1: Check if the database exists and create it if it doesn't
 try {
@@ -41,5 +43,14 @@ try {
     echo "Database setup completed successfully!";
 } catch (PDOException $e) {
     die("Error setting up the database: " . $e->getMessage());
+}
+
+// Step 3: Adding email templates
+try {
+    insertEmailTemplate();
+    insertForgotPasswordTemplate();
+    echo "Email template uploaded successfully!";
+} catch (PDOException $e) {
+    die("Error applying email template: " . $e->getMessage());
 }
 ?>

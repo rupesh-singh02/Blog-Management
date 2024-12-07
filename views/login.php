@@ -177,7 +177,7 @@
             <!-- Login Form -->
             <div class="col-12 col-md-6 d-flex justify-content-center align-items-center" id="login-container">
                 <div class="form-container">
-                    <h2>Login</h2>
+                    <h2 class="text-white">Login</h2>
 
                     <!-- Error message -->
                     <?php if (isset($loginError)) { ?>
@@ -210,7 +210,8 @@
 
     <!-- Success Modal -->
     <?php if (isset($successMessage)) { ?>
-        <div class="modal fade" id="signupSuccessModal" tabindex="-1" aria-labelledby="signupSuccessModalLabel" aria-hidden="true">
+        <div class="modal fade" id="signupSuccessModal" tabindex="-1" aria-labelledby="signupSuccessModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">

@@ -6,7 +6,7 @@ class User {
     private $db;
 
     public function __construct() {
-        $this->db = getDBConnection(); // Now this function is available
+        $this->db = getDBConnection(); // Use the available DB connection
     }
 
     // Function to check if the user already exists
@@ -18,24 +18,11 @@ class User {
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $user ? true : false;  // Return true if user exists
+        return $user ? true : false; // Return true if user exists
     }
 
     // Function to create a new user
     public function register($username, $email, $password) {
-        // Check if the user already exists
-        $sql = "SELECT * FROM users WHERE username = :username OR email = :email";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($existingUser) {
-            // User already exists, return false
-            return false;
-        }
-
         // Insert new user into the database
         $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
         $stmt = $this->db->prepare($sql);
@@ -43,10 +30,7 @@ class User {
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', $password);
 
-        if ($stmt->execute()) {
-            return true;  // User registered successfully
-        }
-        return false;  // Registration failed
+        return $stmt->execute(); // Return true if the user is registered
     }
 
     // Function to check user credentials for login
@@ -58,9 +42,48 @@ class User {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            return $user;  // Login successful
+            return $user; // Login successful
         }
-        return false;  // Login failed
+        return false; // Login failed
+    }
+
+    // Function to get all users
+    public function getAllUsers() {
+        $sql = "SELECT id, username, email FROM users"; // Fetching basic info only
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Return all users as an array
+    }
+
+    // Function to add a new user
+    public function addUser($data) {
+        $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':username', $data['username']);
+        $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':password', password_hash($data['password'], PASSWORD_BCRYPT));
+
+        return $stmt->execute(); // Return true if user is added
+    }
+
+    // Function to update a user's details
+    public function updateUser($data) {
+        $sql = "UPDATE users SET username = :username, email = :email WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':username', $data['username']);
+        $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':id', $data['id']);
+
+        return $stmt->execute(); // Return true if user is updated
+    }
+
+    // Function to delete a user
+    public function deleteUser($id) {
+        $sql = "DELETE FROM users WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $id);
+
+        return $stmt->execute(); // Return true if user is deleted
     }
 }
 ?>

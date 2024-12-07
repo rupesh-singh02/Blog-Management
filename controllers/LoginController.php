@@ -21,11 +21,15 @@ class LoginController {
             if ($user) {
                 // Set session variables and redirect to dashboard
                 $_SESSION['user'] = $user;
-                header('Location: index.php?action=dashboard');
+                if ($user['role'] === 'admin') {
+                    header('Location: index.php?action=adminDashboard');
+                } else {
+                    header('Location: index.php?action=dashboard');
+                }
                 exit;
             } else {
                 // Show error if login fails
-                $error = "Invalid username or password.";
+                $loginError = "Invalid username or password.";
                 include '../views/login.php';
             }
         }

@@ -20,17 +20,12 @@ class Blog
     // Get all posts
     public function getAllPosts($limit, $offset)
     {
-        $query = "SELECT * FROM blog_posts LIMIT :limit OFFSET :offset"; // SQL query to fetch all posts
+        $query = "SELECT * FROM blog_posts LIMIT :limit OFFSET :offset";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-
-        // Check if data is fetched
-        $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        error_log("Posts from DB: " . print_r($posts, true));  // Log data to check if it's returning posts
-
-        return $posts;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Get posts by category
@@ -44,14 +39,47 @@ class Blog
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Get posts
-    public function getPosts($limit, $offset)
+    // Add a new blog post
+    public function addPost($title, $content, $categoryId, $publishedAt)
     {
-        $stmt = $this->db->prepare("SELECT * FROM blog_posts ORDER BY published_at DESC LIMIT :limit OFFSET :offset");
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $query = "INSERT INTO blog_posts (title, content, category_id, published_at) VALUES (:title, :content, :category_id, :published_at)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindParam(':published_at', $publishedAt);
+        return $stmt->execute(); // Return true if insertion is successful
+    }
+
+    // Update an existing blog post
+    public function updatePost($id, $title, $content, $categoryId, $publishedAt)
+    {
+        $query = "UPDATE blog_posts SET title = :title, content = :content, category_id = :category_id, published_at = :published_at WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindParam(':published_at', $publishedAt);
+        return $stmt->execute(); // Return true if update is successful
+    }
+
+    // Delete a blog post
+    public function deletePost($id)
+    {
+        $query = "DELETE FROM blog_posts WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute(); // Return true if deletion is successful
+    }
+
+    // Get a single blog post by ID
+    public function getPostById($id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM blog_posts WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 ?>
