@@ -2,7 +2,7 @@
 // Include the config file that defines the database credentials
 require_once '../config/database.php';
 require_once '../email_templates/welcome.php';
-require_once '../email_templates/forgotpassword.php';
+require_once '../email_templates/forgotPassword.php';
 
 // Step 1: Check if the database exists and create it if it doesn't
 try {
