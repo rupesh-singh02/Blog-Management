@@ -24,6 +24,7 @@ class SignupController
     // Handle signup form submission
     public function signup()
     {
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = $_POST['username'];
             $email = $_POST['email'];
@@ -34,20 +35,22 @@ class SignupController
 
             // Create a new User instance and try to register the user
             $userModel = new User();
-            $user = $userModel->register($username, $email, $hashedPassword);
+            
+            if ($userModel->checkIfUserExists($username, $email)) {
+                $signupError = "User already exists. Please choose a different username or email.";
+                include '../views/login.php';  // Show signup form with error
 
-            if ($user) {
-                // If user registered successfully, send email with login details
+            } else {
+
+                $user = $userModel->register($username, $email, $hashedPassword);
+                
                 $this->sendSuccessEmail($email, $username, $password);
 
                 // Pass success message to the view
                 $successMessage = "Signup successful! Please check your email for login credentials.";
-                include '../views/login.php';  // Show the login form with success modal
-            } else {
-                // Show error if registration failed (e.g., user already exists)
-                $signupError = "User already exists. Please choose a different username or email.";
-                include '../views/login.php';  // Show signup form with error
+                include '../views/login.php';
             }
+
         }
     }
 

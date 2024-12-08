@@ -53,4 +53,43 @@ try {
 } catch (PDOException $e) {
     die("Error applying email template: " . $e->getMessage());
 }
+
+// Step 4: Insert initial data into the 'users' and 'categories' tables
+
+// Insert 1 admin user
+try {
+    $adminPassword = password_hash('admin123', PASSWORD_BCRYPT); // Hash the password
+    $sql = "INSERT INTO users (username, email, password, role) VALUES 
+            ('admin', 'admin@gmail.com', :password, 'admin')";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':password', $adminPassword);
+    $stmt->execute();
+    echo "Admin user inserted successfully!<br>";
+} catch (PDOException $e) {
+    die("Error inserting admin user: " . $e->getMessage());
+}
+
+// Insert 5 categories
+try {
+    $categories = [
+        ['name' => 'Technology', 'description' => 'All about technology.'],
+        ['name' => 'Health', 'description' => 'Health-related articles and news.'],
+        ['name' => 'Travel', 'description' => 'Travel experiences and tips.'],
+        ['name' => 'Education', 'description' => 'Educational resources and insights.'],
+        ['name' => 'Lifestyle', 'description' => 'Lifestyle trends and advice.']
+    ];
+
+    $sql = "INSERT INTO categories (name, description) VALUES (:name, :description)";
+    $stmt = $pdo->prepare($sql);
+
+    foreach ($categories as $category) {
+        $stmt->bindParam(':name', $category['name']);
+        $stmt->bindParam(':description', $category['description']);
+        $stmt->execute();
+    }
+
+    echo "Categories inserted successfully!<br>";
+} catch (PDOException $e) {
+    die("Error inserting categories: " . $e->getMessage());
+}
 ?>

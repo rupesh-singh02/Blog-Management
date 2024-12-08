@@ -99,5 +99,87 @@ class Blog
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Fetch all blog posts by a specific user
+    public function getPostsByUserId($userId)
+    {
+        $stmt = $this->db->prepare("SELECT blog_posts.*, 
+                                       categories.name AS category_name, 
+                                       users.username AS author_name 
+                                FROM blog_posts
+                                JOIN categories ON blog_posts.category_id = categories.id
+                                JOIN users ON blog_posts.author_id = users.id
+                                WHERE blog_posts.author_id = :user_id");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all posts for the given user
+    }
+
+    public function getAuthorByPostId($postId)
+    {
+        // Query to fetch the author's name
+        $stmt = $this->db->prepare("SELECT * FROM users u JOIN blog_posts p ON u.id = p.author_id WHERE p.id = ?");
+        $stmt->execute([$postId]);
+        return $stmt->fetch();
+    }
+
+    public function getCommentsByPostId($postId)
+    {
+        // Query to fetch comments along with the user's name
+        $stmt = $this->db->prepare("
+            SELECT comments.*, users.username AS username 
+            FROM comments 
+            JOIN users ON comments.user_id = users.id 
+            WHERE comments.post_id = ? 
+            ORDER BY comments.created_at DESC
+        ");
+        $stmt->execute([$postId]);
+        return $stmt->fetchAll();
+    }
+
+
+    public function addComment($postId, $userId, $commentContent)
+    {
+        // Query to insert a new comment into the database
+        $stmt = $this->db->prepare("INSERT INTO comments (post_id, user_id, content, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([$postId, $userId, $commentContent]);
+    }
+
+    public function getRecentPosts()
+    {
+        $stmt = $this->db->prepare("
+            SELECT blog_posts.*, 
+                   categories.name AS category_name, 
+                   users.username AS author_name 
+            FROM blog_posts
+            JOIN categories ON blog_posts.category_id = categories.id
+            JOIN users ON blog_posts.author_id = users.id
+            ORDER BY blog_posts.created_at DESC
+            LIMIT 5
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Get top 5 blogs with the highest number of comments
+    public function getTopCommentedPosts()
+    {
+        $stmt = $this->db->prepare("
+            SELECT blog_posts.*, 
+                   categories.name AS category_name, 
+                   users.username AS author_name, 
+                   COUNT(comments.id) AS comment_count
+            FROM blog_posts
+            LEFT JOIN comments ON blog_posts.id = comments.post_id
+            JOIN categories ON blog_posts.category_id = categories.id
+            JOIN users ON blog_posts.author_id = users.id
+            GROUP BY blog_posts.id
+            ORDER BY comment_count DESC, blog_posts.created_at DESC
+            LIMIT 5
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
 ?>

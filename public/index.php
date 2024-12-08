@@ -62,6 +62,18 @@ switch ($action) {
         $loginController->logout(); // Handle logout
         break;
 
+    case 'processForgotPassword':
+        $loginController->processForgotPassword(); // Handle Forgot Password submission
+        break;
+
+    case 'resetPassword':
+        $loginController->resetPasswordForm($_GET['token']); // Show Reset Password form
+        break;
+
+    case 'processResetPassword':
+        $loginController->processResetPassword(); // Handle Reset Password submission
+        break;
+
     case 'dashboard':
         // Ensure user is logged in before accessing dashboard
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'user') {
@@ -69,6 +81,28 @@ switch ($action) {
             exit;
         }
         $dashboardController->dashboard(); // Show dashboard
+        break;
+    case 'userAction':
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'user') {
+            header('Location: index.php?action=login');
+            exit;
+        }
+        $dashboardController->handleAction($_GET['section'], $_GET['task']);
+        break;
+    case 'singlePost':
+        if (!isset($_GET['post_id'])) {
+            header('Location: index.php');
+            exit;
+        }
+        $dashboardController->singlePost($_GET['post_id']);
+        break;
+
+    case 'addComment':
+        if (!isset($_GET['post_id'])) {
+            header('Location: index.php');
+            exit;
+        }
+        $dashboardController->addComment($_GET['post_id']);
         break;
     case 'adminDashboard':
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {

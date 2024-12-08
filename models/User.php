@@ -70,6 +70,60 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function storePasswordResetToken($userId, $token, $expiresAt)
+    {
+        $sql = "INSERT INTO reset_password_token (user_id, token, expiresAt) VALUES (:user_id, :token, :expiresAt)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->bindParam(':expiresAt', $expiresAt, PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    public function isValidToken($token)
+    {
+        $sql = "SELECT * FROM reset_password_token WHERE token = :token AND expiresAt > NOW() LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+    }
+
+    public function getUserIdByToken($token)
+    {
+        $sql = "SELECT user_id FROM reset_password_token WHERE token = :token LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function deleteToken($token)
+    {
+        $sql = "DELETE FROM reset_password_token WHERE token = :token";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    public function updatePassword($userId, $hashedPassword)
+    {
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function getUserByEmail($email)
+    {
+        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Function to update a user's details
     public function updateUser($data)
     {

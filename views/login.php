@@ -10,6 +10,8 @@
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/da2c8b88da.js" crossorigin="anonymous"></script>
+
     <!-- Custom CSS -->
     <style>
         body {
@@ -102,6 +104,14 @@
             color: #721c24;
         }
 
+        #loginBack {
+            cursor: pointer;
+        }
+
+        .forgot-link a:hover {
+            color: blue !important;
+        }
+
         /* Responsive Design */
         @media (max-width: 767px) {
             .row {
@@ -175,33 +185,62 @@
             </div>
 
             <!-- Login Form -->
-            <div class="col-12 col-md-6 d-flex justify-content-center align-items-center" id="login-container">
-                <div class="form-container">
-                    <h2 class="text-white">Login</h2>
-
-                    <!-- Error message -->
-                    <?php if (isset($loginError)) { ?>
+            <div class="col-12 col-md-6" id="login-container">
+                <div class="d-flex justify-content-center align-items-center vh-100">
+                    <div class="form-container">
+                        <h2>Login</h2>
+                        <?php if (isset($loginError)) { ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>Error:</strong> <?php echo htmlspecialchars($loginError); ?>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php } ?>
+                        <form action="index.php?action=loginPost" method="post">
+                            <div class="form-floating mb-3">
+                                <input type="text" id="username" name="username" class="form-control" required
+                                    placeholder=" ">
+                                <label for="username">Username</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" id="password" name="password" class="form-control" required
+                                    placeholder=" ">
+                                <label for="password">Password</label>
+                            </div>
+                            <div class="forgot-link">
+                                <a class="text-decoration-none text-white" href="javascript:void(0)" id="forgotPasswordLink">Forgot Password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-4">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-                    <form action="index.php?action=loginPost" method="post">
-                        <div class="form-floating mb-3">
-                            <input type="text" id="username" name="username" class="form-control" required
-                                placeholder=" ">
-                            <label for="username">Username</label>
+            <!-- Forgot Password Form -->
+            <div class="col-12 col-md-6 d-none" id="forgot-container">
+                <div class="pt-4 ps-3">
+                    <i class="fa-solid fa-arrow-left fs-4" id="loginBack"></i>
+                </div>
+                <div class="d-flex justify-content-center align-items-center flex-column mt-5 pt-5">
+
+                    <?php if (isset($resetError)) { ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error:</strong> <?php echo htmlspecialchars($resetError); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                    <?php } ?>
 
-                        <div class="form-floating mb-3">
-                            <input type="password" id="password" name="password" class="form-control" required
-                                placeholder=" ">
-                            <label for="password">Password</label>
-                        </div>
+                    <div class="form-container">
+                        <h2>Forgot Password</h2>
 
-                        <button type="submit" class="btn btn-primary mt-4">Login</button>
-                    </form>
+                        <form action="index.php?action=processForgotPassword" method="post">
+                            <div class="form-floating mb-3">
+                                <input type="email" id="forgot-email" name="email" class="form-control" required
+                                    placeholder=" ">
+                                <label for="forgot-email">Enter Your Email</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-4">Reset Password</button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -227,6 +266,23 @@
                 </div>
             </div>
         </div>
+    <?php } elseif (isset($resetMessage)) { ?>
+        <div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resetModalLabel">Reset Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo htmlspecialchars($resetMessage); ?>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="index.php?action=login" class="btn btn-primary">Ok</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     <?php } ?>
 
     <!-- Bootstrap JS -->
@@ -240,6 +296,28 @@
             var successModal = new bootstrap.Modal(document.getElementById('signupSuccessModal'));
             successModal.show();
         <?php } ?>
+
+        <?php if (isset($resetMessage)) { ?>
+            var resetModal = new bootstrap.Modal(document.getElementById('resetModal'));
+            resetModal.show();
+        <?php } ?>
+
+        <?php if (isset($temp)) { ?>
+            <?php if ($temp === "error") { ?>
+                document.getElementById('login-container').classList.add('d-none');
+                document.getElementById('forgot-container').classList.remove('d-none');
+            <?php } ?>
+        <?php } ?>
+
+        document.getElementById('forgotPasswordLink').addEventListener('click', function () {
+            document.getElementById('login-container').classList.add('d-none');
+            document.getElementById('forgot-container').classList.remove('d-none');
+        });
+
+        document.getElementById('loginBack').addEventListener('click', function () {
+            document.getElementById('login-container').classList.remove('d-none');
+            document.getElementById('forgot-container').classList.add('d-none');
+        });
     </script>
 
 </body>

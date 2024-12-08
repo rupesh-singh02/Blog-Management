@@ -18,7 +18,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg px-5 fixed-top">
         <div class="container-fluid px-2">
-            <a class="navbar-brand p-0" href="#">Let's Blog</a>
+        <a class="navbar-brand p-0" href="/index.php?action=<?= isset($_SESSION['user']) ? ($_SESSION['user']['role'] === 'admin' ? 'adminDashboard' : 'dashboard') : 'login' ?>">Let's Blog</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -38,6 +38,15 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
+                            <?php if (isset($_GET['action']) && $_GET['action'] !== 'adminDashboard'): ?>
+                                <li>
+                                    <a class="dropdown-item text-center" href="index.php?action=dashboard&section=blogs">My Blogs</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            <?php endif; ?>
+                            
                             <li>
                                 <form method="POST" action="index.php?action=logout">
                                     <button type="submit" class="dropdown-item text-center">Logout</button>
