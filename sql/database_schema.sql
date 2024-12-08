@@ -78,3 +78,4 @@ CREATE TABLE reset_password_token (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+SET time_zone = '+05:30';

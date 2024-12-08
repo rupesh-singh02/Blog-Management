@@ -82,7 +82,7 @@ class LoginController
 
             // Generate reset token and expiration time
             $resetToken = bin2hex(random_bytes(32));
-            $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            $expiresAt = date('Y-m-d H:i:s', strtotime('+5 minutes'));
 
             // Save token to the `reset_password_token` table
             if ($this->userModel->storePasswordResetToken($user['id'], $resetToken, $expiresAt)) {
@@ -171,7 +171,7 @@ class LoginController
             }
 
             // Replace placeholders in the template
-            $resetLink = "http://127.0.0.1/blog/public/index.php?action=resetPassword&token=" . $resetToken;
+            $resetLink = "http://127.0.0.1/blog-management/public/index.php?action=resetPassword&token=" . $resetToken;
             $body = str_replace(
                 ['{username}', '{reset_link}'],
                 [$user['username'], $resetLink],
