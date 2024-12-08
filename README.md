@@ -44,8 +44,11 @@ This will:
     - Insert an admin user with the username admin and password admin123.
     - Insert 5 sample categories.
 
+### 4. Add the smtp credentials in email_config table
 
-### 4. Create a New User
+INSERT INTO `email_config` (`id`, `smtp_host`, `smtp_port`, `smtp_username`, `smtp_password`, `sender_email`, `sender_name`) VALUES (1, 'mail.rupeshsingh.in', 587, 'blog@rupeshsingh.in', 'Slayer@123', 'blog@rupeshsingh.in', 'Let\'s Blog');
+
+### 5. Create a New User
 
 Open your browser and navigate to http://localhost/blog-management/public/index.php?action=login
 
