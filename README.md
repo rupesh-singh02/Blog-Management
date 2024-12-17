@@ -67,7 +67,7 @@ Insert SMTP credentials into the `email_config` table for email functionality. U
 ```sql
 INSERT INTO `email_config` (`id`, `smtp_host`, `smtp_port`, `smtp_username`, `smtp_password`, `sender_email`, `sender_name`) 
 VALUES 
-(1, 'mail.rupeshsingh.in', 587, 'blog@rupeshsingh.in', 'Slayer@123', 'blog@rupeshsingh.in', 'Let\'s Blog');
+(1, 'mail.test.in', 587, 'blog@test.in', 'test@123', 'blog@test.in', 'Let\'s Blog');
 ```
 
 ### Step 5: Start the Application
